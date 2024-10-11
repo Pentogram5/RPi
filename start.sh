@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sleep 3
+sleep 30
 git pull origin main
 sleep 7
 sudo python /home/pi/work/python_src/xr_startmain.py &
