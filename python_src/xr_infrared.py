@@ -10,7 +10,7 @@
 @Author  : xiaor
 @Explain :红外
 @contact : 666
-@Time    :2020/05/09 Fed
+@Time    :2020/05/09 Apr
 @File    :xr_infrared.py
 @Software: PyCharm
 """
