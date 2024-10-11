@@ -9,7 +9,7 @@
 @version: python3.7
 @Author  : xiaor
 @Explain :红外
-@contact :
+@contact : 666 666
 @Time    :2020/05/09 Apr
 @File    :xr_infrared.py
 @Software: PyCharm
@@ -91,7 +91,7 @@ class Infrared(object):
 				go.stop()
 				cfg.AVOIDDROP_CHANGER = 0
 	def send_ir(self):
-		buf = bytes([gpio.digital_read(grio.IR_L), gpio.digital_read(gpio.IR_R), gpio.digital_read(gpio.IRF_L), gpio.digital_read(gpio.IR_M), gpio.digital_read(gpio.IRF_R)])
+		buf = bytes([gpio.digital_read(gpio.IR_L), gpio.digital_read(gpio.IR_R), gpio.digital_read(gpio.IRF_L), gpio.digital_read(gpio.IR_M), gpio.digital_read(gpio.IRF_R)])
 		try:
 			socket.sendbuf(buf)
 		except Exception as e:

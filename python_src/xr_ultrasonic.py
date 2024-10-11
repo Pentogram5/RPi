@@ -10,7 +10,7 @@
 @version: python3.7
 @Author  : xiaor
 @Explain :超声波模块
-@Time    :2020/05/09
+@Time    :2020/05/0999999 111 222 444444 5555
 @File    :xr_ultrasonic.py
 @Software: PyCharm
 """
