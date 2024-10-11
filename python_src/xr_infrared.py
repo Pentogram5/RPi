@@ -9,8 +9,8 @@
 @version: python3.7
 @Author  : xiaor
 @Explain :红外
-@contact :
-@Time    :2020/05/09
+@contact : 666 666
+@Time    :2020/05/09 Apr
 @File    :xr_infrared.py
 @Software: PyCharm
 """
