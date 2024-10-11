@@ -115,6 +115,7 @@ def cruising_mode():
 		time.sleep(0.01)
 	elif cfg.CRUISING_FLAG == cfg.CRUISING_SET['normal']:
 		ultrasonic.send_distance()
+		infrared.send_ir()
 		time.sleep(1)
 		if cfg.VOICE_MOD == cfg.VOICE_MOD_SET['normal']:
 			time.sleep(0.001)

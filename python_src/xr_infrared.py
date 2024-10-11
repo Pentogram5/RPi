@@ -90,3 +90,11 @@ class Infrared(object):
 			if cfg.AVOIDDROP_CHANGER == 1: 	# 只有当上一次得到状态是正常状态时才会运行停止，避免重复执行停止无法再进行遥控
 				go.stop()
 				cfg.AVOIDDROP_CHANGER = 0
+	def send_ir(self):
+		buf = bytes([gpio.digital_read(grio.IR_L), gpio.digital_read(gpio.IR_R), gpio.digital_read(gpio.IRF_L), gpio.digital_read(gpio.IR_M), gpio.digital_read(gpio.IRF_R)])
+		try:
+			socket.sendbuf(buf)
+		except Exception as e:
+			print("send_distance error: ", e)
+		else:
+			buf = []
