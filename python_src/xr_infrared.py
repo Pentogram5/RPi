@@ -9,7 +9,7 @@
 @version: python3.7
 @Author  : xiaor
 @Explain :红外
-@contact :
+@contact : 666
 @Time    :2020/05/09 Fed
 @File    :xr_infrared.py
 @Software: PyCharm
