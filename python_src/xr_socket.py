@@ -138,25 +138,25 @@ class Socket:
 			else:
 				go.stop()
 
-		elif buffer[0] == 0x01:  # 控制舵机指令
+		elif buffer[0] == 0x01:  # сервопривод
 			cfg.SERVO_NUM = buffer[1]  # 获取舵机号
 			cfg.SERVO_ANGLE = buffer[2]  # 获取舵机角度
 			if abs(cfg.SERVO_ANGLE - cfg.SERVO_ANGLE_LAST) > 2:  # 限制舵机重复下发角度
 				cfg.ANGLE[cfg.SERVO_NUM-1] = cfg.SERVO_ANGLE
 				servo.set(cfg.SERVO_NUM, cfg.SERVO_ANGLE)
 
-		elif buffer[0] == 0x02:  # 调节电机速度
-			if buffer[1] == 0x01:  # 调节左侧电机速度
+		elif buffer[0] == 0x02:  # Отрегулируйте частоту вращения двигателя
+			if buffer[1] == 0x01:  # левого двигателя
 				cfg.LEFT_SPEED = buffer[2]
 				go.set_speed(1, cfg.LEFT_SPEED)	 # 设置左侧速度
 				go.save_speed()
 
-			elif buffer[1] == 0x02:  # 调节右侧电机速度
+			elif buffer[1] == 0x02:  # правый двигатель
 				cfg.RIGHT_SPEED = buffer[2]
 				go.set_speed(2, cfg.RIGHT_SPEED)  # 设置右侧速度
 				go.save_speed()
 
-		elif buffer[0] == 0x06:  # 设置颜色检测跟随功能中的跟随颜色
+		elif buffer[0] == 0x06:  # Установите цвет led-ленты
 			if buffer[1] == 0x01:
 				cfg.COLOR_INDEX = cfg.COLOR_FOLLOW_SET['red']		# 设置颜色检测颜色区间为红色
 				car_light.set_ledgroup(cfg.CAR_LIGHT, 8, cfg.COLOR['red'])	 # 设置车灯为红色，提示作用
@@ -218,7 +218,7 @@ class Socket:
 				servo.set(4, 90)
 				servo.set(7, 90)
 				servo.set(8, 0)
-				if buffer[2] == 0x00:  	 # 摄像头巡线调试模式，即正常开启视频传输模式
+				if buffer[2] == 0x00:  	 # режим передачи видео включен в обычном режиме
 					go.stop()  # 停止
 					cfg.LEFT_SPEED = cfg.LASRT_LEFT_SPEED  # 将保存的速度复位
 					cfg.RIGHT_SPEED = cfg.LASRT_RIGHT_SPEED

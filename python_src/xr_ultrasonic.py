@@ -41,14 +41,14 @@ class Ultrasonic(object):
 
 	def get_distance(self):
 		"""
-		获取超声波距离函数,有返回值distance，单位cm
+		Получите функцию определения ультразвукового расстояния с возвращаемым значением расстояния в сантиметрах
 		"""
 		time_count = 0
 		time.sleep(0.01)
 		gpio.digital_write(gpio.TRIG, True)  # 拉高超声波Trig引脚
 		time.sleep(0.000015)  # 发送10um以上高电平方波
 		gpio.digital_write(gpio.TRIG, False)  # 拉低
-		while not gpio.digital_read(gpio.ECHO):  # 等待Echo引脚由低电平变成高电平
+		while not gpio.digital_read(gpio.ECHO):  # Дождитесь, пока эхо-сигнал изменится с низкого на высокий
 			pass
 		t1 = time.time()  # 记录Echo引脚高电平开始时间点
 		while gpio.digital_read(gpio.ECHO):  # 等待Echo引脚由低电平变成低电平
