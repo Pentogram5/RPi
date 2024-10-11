@@ -2,6 +2,8 @@
 
 sleep 3
 sudo git pull origin main
+Fe0dor
+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
 sleep 7
 sudo python /home/pi/work/python_src/xr_startmain.py &
 sleep 5
