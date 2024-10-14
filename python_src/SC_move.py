@@ -30,8 +30,5 @@ def setDirection(direction, speed):
         setMotor(2, abs(direction), speed)
 
 while True:
-    try:
-        direction, speed = map(float, input().split())
-    except:
-        go.stop()
+    direction, speed = map(float, input().split())
     setDirection(direction, speed)
