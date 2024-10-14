@@ -16,6 +16,8 @@
 """
 import time
 from builtins import int, chr, object
+import numpy as np
+
 
 import xr_gpio as gpio
 import xr_config as cfg
@@ -38,6 +40,20 @@ class Ultrasonic(object):
 		self.dis = 0
 		self.s_L = 0
 		self.s_R = 0
+
+		# initialization for kalman filters
+		self.x = 0. # initial distance estimate
+		self.p = 1000. # initial uncertainity
+		
+		self.u = 0.
+		self.F = 1.
+		self.B = 0.
+		self.H = 1.
+		self.Q = 0.00001
+		self.R = 0.10071589
+
+
+
 
 	def get_distance(self):
 		"""
@@ -68,9 +84,53 @@ class Ultrasonic(object):
 			cfg.DISTANCE = round(distance, 2)
 			return cfg.DISTANCE
 		else:
-			# print("distance is 0")  # 如果距离值大于5m,超出检测范围
+			# print("distance is 0")  # Если значение расстояния превышает 5 м, оно находится за пределами диапазона обнаружения
 			cfg.DISTANCE = 0
 			return 0
+
+
+	def get_kalman_dist(self):
+		"""
+		Получите функцию определения ультразвукового расстояния с возвращаемым значением расстояния в сантиметрах
+		"""
+		time_count = 0
+		time.sleep(0.01)
+		gpio.digital_write(gpio.TRIG, True)  # 拉高超声波Trig引脚
+		time.sleep(0.000015)  # 发送10um以上高电平方波
+		gpio.digital_write(gpio.TRIG, False)  # 拉低
+		while not gpio.digital_read(gpio.ECHO):  # Дождитесь, пока эхо-сигнал изменится с низкого на высокий
+			pass
+		t1 = time.time()  # 记录Echo引脚高电平开始时间点
+		while gpio.digital_read(gpio.ECHO):  # 等待Echo引脚由低电平变成低电平
+			if time_count < 2000:  # 超时检测，防止死循环
+				time_count = time_count + 1
+				time.sleep(0.000001)
+				pass
+			else:
+				print("NO ECHO receive! Please check connection")
+				break
+		t2 = time.time()  # 记录Echo引脚高电平结束时间点
+		distance = (t2 - t1) * 340 / 2 * 100  # Echo引脚高电平持续时间就是超声波由发射到返回的时间，即用时间x声波速度/2等于单程即超声波距物体距离值
+
+		if distance < 500:
+			cfg.DISTANCE = 0
+			return cfg.DISTANCE
+
+		else:
+			x_predicted = self.F * self.x + self.B * self.u
+			p_predicted = self.F * self.p * self.F + self.Q
+
+			# measurement update
+			y = distance - (self.H * x_predicted)
+
+			# kalman estimation   
+			s = self.H * p_predicted * self.H + self.R
+			K = p_predicted * self.H * (1 / s)
+			self.x = x_predicted + (K * y)
+			self.p = (1 - (K * self.H)) * p_predicted
+			
+			cfg.DISTANCE = self.x
+			return cfg.DISTANCE
 
 	def avoidbyragar(self):
 		"""
@@ -88,7 +148,7 @@ class Ultrasonic(object):
 
 	def send_distance(self):
 		"""
-		发送超声波数据至上位机
+		Отправляйте ультразвуковые данные на верхнюю машину
 		"""
 		dis_send = int(self.get_distance())
 		# print(dis_send)
