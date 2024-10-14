@@ -20,6 +20,7 @@ class RobotControlServer:
         client_socket.close()
 
     def execute_command(self, command):
+        command = command.split()
         direction = int(command[0])
         speed = int(command[1]) 
         setDirection(direction, speed)
