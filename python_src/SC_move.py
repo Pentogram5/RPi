@@ -23,11 +23,11 @@ def setDirection(direction, speed):
         setMotor(1, 0, speed)
         setMotor(2, 0, speed)
     elif direction > 0:
-        setMotor(1, abs(direction), speed)
-        setMotor(2, 0, speed)
-    else:
         setMotor(1, 0, speed)
         setMotor(2, abs(direction), speed)
+    else:
+        setMotor(1, abs(direction), speed)
+        setMotor(2, 0, speed)
 
 while True:
     direction, speed = map(float, input().split())
