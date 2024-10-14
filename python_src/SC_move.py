@@ -8,14 +8,14 @@ def setMotor(motor, direction, speed):
     go.set_speed(motor, speed * abs(direction - 1))
     if direction <= 1:
         if motor == 1:
-            go.m1m2_forward()
-        else:
             go.m3m4_forward()
+        else:
+            go.m1m2_forward()
     else:
         if motor == 1:
-            go.m1m2_reverse()
-        else:
             go.m3m4_reverse()
+        else:
+            go.m1m2_reverse()
 
 
 def setDirection(direction, speed):
