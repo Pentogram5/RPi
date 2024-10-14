@@ -42,16 +42,15 @@ class Ultrasonic(object):
 		self.s_R = 0
 
 		# initialization for kalman filters
-		self.x = np.matrix([[0.]]) # initial distance estimate
-		self.p = np.matrix([[1000.]]) # initial uncertainity
+		self.x = 0. # initial distance estimate
+		self.p = 1000. # initial uncertainity
 		
-		self.u = np.matrix([[0.]])
-		self.w = np.matrix([[0]])
-		self.F = np.matrix([[1.]])
-		self.B = np.matrix([[0.]])
-		self.H = np.matrix([[1.]])
-		self.Q = np.matrix([[0.00001]])
-		self.R = np.matrix([[0.10071589]])
+		self.u = 0.
+		self.F = 1.
+		self.B = 0.
+		self.H = 1.
+		self.Q = 0.00001
+		self.R = 0.10071589
 
 
 
@@ -85,7 +84,7 @@ class Ultrasonic(object):
 			cfg.DISTANCE = round(distance, 2)
 			return cfg.DISTANCE
 		else:
-			# print("distance is 0")  # 如果距离值大于5m,超出检测范围
+			# print("distance is 0")  # Если значение расстояния превышает 5 м, оно находится за пределами диапазона обнаружения
 			cfg.DISTANCE = 0
 			return 0
 
@@ -113,19 +112,25 @@ class Ultrasonic(object):
 		t2 = time.time()  # 记录Echo引脚高电平结束时间点
 		distance = (t2 - t1) * 340 / 2 * 100  # Echo引脚高电平持续时间就是超声波由发射到返回的时间，即用时间x声波速度/2等于单程即超声波距物体距离值
 
-		x_predicted = self.F * self.x + self.B * self.u + self.w
-		p_predicted = self.F * self.p * np.transpose(self.F) + self.Q
+		if distance < 500:
+			cfg.DISTANCE = 0
+			return cfg.DISTANCE
 
-		# measurement update
-		y = distance - (self.H * x_predicted)
+		else:
+			x_predicted = self.F * self.x + self.B * self.u
+			p_predicted = self.F * self.p * self.F + self.Q
 
-		# kalman estimation   
-		s = self.H * p_predicted * np.transpose(self.H) + self.R
-		K = p_predicted * np.transpose(self.H) * np.linalg.inv(s)
+			# measurement update
+			y = distance - (self.H * x_predicted)
 
-		self.x = x_predicted + (K * y)
-		self.p = (1 - (K * self.H)) * p_predicted
-		return self.x
+			# kalman estimation   
+			s = self.H * p_predicted * self.H + self.R
+			K = p_predicted * self.H * (1 / s)
+			self.x = x_predicted + (K * y)
+			self.p = (1 - (K * self.H)) * p_predicted
+			
+			cfg.DISTANCE = self.x
+			return cfg.DISTANCE
 
 	def avoidbyragar(self):
 		"""
