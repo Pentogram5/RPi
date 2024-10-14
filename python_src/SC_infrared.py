@@ -34,6 +34,6 @@ class ScInfrared:
                 'distance': self.distance,
                 'value': self.getNewValue()}
 
-RI_1 = ScInfrared(1, 22, 10)
-RI_2 = ScInfrared(2, 18, 10)
-RI_3 = ScInfrared(3, 27, 10)
+IR_1 = ScInfrared(IR_GREEN, 22, 10)
+IR_2 = ScInfrared(IR_RED, 18, 10)
+IR_3 = ScInfrared(IR_BLACK, 27, 10)
