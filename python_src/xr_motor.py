@@ -41,9 +41,9 @@ class RobotDirection(object):
 
 	def motor_init(self):
 		"""
-		获取机器人存储的速度
+		Получите скорость хранения данных роботом
 		"""
-		print("获取机器人存储的速度")
+		print("Получите скорость хранения данных роботом")
 		speed = cfgparser.get_data('motor', 'speed')
 		cfg.LEFT_SPEED = speed[0]
 		cfg.RIGHT_SPEED = speed[1]
