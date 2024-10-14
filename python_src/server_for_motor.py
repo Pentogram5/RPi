@@ -1,7 +1,7 @@
 import socket
 import threading
 
-import SC_move
+from SC_move import * 
 
 class RobotControlServer:
     def __init__(self, host='0.0.0.0', port=8888):
