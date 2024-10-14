@@ -36,6 +36,8 @@ class RobotDirection(object):
 			self.m1m2_forward()
 			speed = speed*self.speed_const_left
 			gpio.ena_pwm(speed)
+		elif (speed == 0):
+			self.m1m2_stop()
 		else:
 			self.m1m2_reverse()
 			
@@ -48,6 +50,8 @@ class RobotDirection(object):
 			speed = speed*self.speed_const_right
 			speed = round(speed)
 			gpio.enb_pwm(speed)
+		elif (speed == 0):
+			self.m3m4_stop()
 		else:
 			self.m3m4_reverse()
 			speed = (-1)*speed*self.speed_const_right
