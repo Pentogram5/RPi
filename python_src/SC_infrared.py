@@ -32,7 +32,7 @@ class ScInfrared:
     def getSerialise(self):
         return {'id': str(self.id),
                 'distance': self.distance,
-                'value': self.getNewValue(self)}
+                'value': self.getNewValue()}
 
 RI_1 = ScInfrared(1, 22, 10)
 RI_2 = ScInfrared(2, 18, 10)
