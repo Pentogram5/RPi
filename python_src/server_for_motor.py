@@ -1,7 +1,7 @@
 import socket
 import threading
 
-from xr_motor import RobotDirection
+import SC_move
 
 class RobotControlServer:
     def __init__(self, host='0.0.0.0', port=8888):
@@ -20,16 +20,10 @@ class RobotControlServer:
         client_socket.close()
 
     def execute_command(self, command):
-        if command == "forward":
-            robot.forward()
-        elif command == "back":
-            robot.back()
-        elif command == "left":
-            robot.left()
-        elif command == "right":
-            robot.right()
-        elif command == "stop":
-            robot.stop()
+        direction = int(command[0])
+        speed = int(command[1]) 
+        setDirection(direction, speed)
+
 
     def start(self):
         while True:
@@ -39,7 +33,6 @@ class RobotControlServer:
             client_handler.start()
 
 if __name__ == "__main__":
-    robot = RobotDirection()
-    robot.motor_init()  # Инициализация моторов
+
     server = RobotControlServer()
     server.start()
