@@ -28,7 +28,7 @@ cfgparser = HandleConfig(path_data)
 class RobotDirection(object):
 	
 	
-	def set_consts(left,right):
+	def set_consts(left,right,self):
 		self.speed_const_left = left
 		self.speed_const_right = right
 
