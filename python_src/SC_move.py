@@ -30,6 +30,10 @@ def setDirection(direction, speed):
         setMotor(2, abs(direction), speed)
 
 while True:
-    direction = float(input())
-    speed = 50
+    try:
+        direction = float(input())
+    except:
+        setMotor(1, 1, speed)
+        setMotor(2, 1, speed)
+    speed = 20
     setDirection(direction, speed)
