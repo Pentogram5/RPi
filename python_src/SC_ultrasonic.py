@@ -14,11 +14,11 @@ import json
 #         return dt
 # ts = TimeStamper()
 
-class ScInfrared:
+class ScUltrasonic:
     rawValue = 0 # Последнее значение
     filteredValue = 0
     
-    def __init__(self, id='IR_GREEN', pin=22, distance=10, averageCount=10,
+    def __init__(self, id='ULTRASONIC', pin=22, distance=10, averageCount=10,
                  rawValue=None, filteredValue=None):
         self.id = id
         self.pin = pin
@@ -52,7 +52,6 @@ class ScInfrared:
 
     def serialize(self):
         return {'id': str(self.id),
-                'distance': self.distance,
                 'rawValue': self.rawValue,
                 'filteredValue': self.filteredValue}
     
@@ -60,7 +59,7 @@ class ScInfrared:
     def deserialize(self, json_data):
         # data = json.loads(json_str)
         data = json_data
-        return ScInfrared(
+        return ScUltrasonic(
             id=data['id'],
             distance=data['distance'],
             rawValue=data['rawValue'],
@@ -72,6 +71,7 @@ class ScInfrared:
             # self.averageCount
             val = self.getNewRawValue()
             self.filteredValue = self._filter_value(val)
+            # print(self.filteredValue)
             # print(self.id,self.ts.timestamp())
             time.sleep(0)
     
@@ -90,15 +90,4 @@ class ScInfrared:
         self.update_thread = threading.Thread(target=self._update_thread)
         self.update_thread.start()
 
-IR_G = ScInfrared('IR_GREEN', 22, 10)
-IR_R = ScInfrared('IR_RED', 18, 10)
-IR_B = ScInfrared('IR_BLACK', 27, 10)
-
-if __name__=='__main__':
-    IR_G.start_update_thread()
-    IR_R.start_update_thread()
-    IR_B.start_update_thread()
-    
-    while True:
-        print(IR_G.filteredValue)
-        # print(ts.timestamp())
+ULTRASONIC = ScUltrasonic('ULTRASONIC', 22, 10)

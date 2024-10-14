@@ -23,139 +23,145 @@ import xr_config as cfg
 from xr_configparser import HandleConfig
 path_data = os.path.dirname(os.path.realpath(__file__)) + '/data.ini'
 cfgparser = HandleConfig(path_data)
-
+        
 
 class RobotDirection(object):
+    def __init__(self, left=1, right=1):
+        self.speed_const_left = left
+        self.speed_const_right = right
+     
+    def set_consts(self,left,right):
+        self.speed_const_left = left
+        self.speed_const_right = right
 
-	def set_consts(self,left,right):
-		self.speed_const_left = left
-		self.speed_const_right = right
+    def set_speed_cms_left(self,speed):
+        if (speed > 0):
+            self.m1m2_forward()
+            speed = speed*self.speed_const_left
+            gpio.ena_pwm(speed)
+        else:
+            self.m1m2_reverse()
+            
+            speed = (-1)*speed*self.speed_const_left
+            gpio.ena_pwm(speed)
+        return speed
+    
+    def set_speed_cms_right(self,speed):
+        if (speed > 0):
+            self.m3m4_forward()
+            speed = speed*self.speed_const_right
+            speed = round(speed)
+            gpio.enb_pwm(speed)
+        else:
+            self.m3m4_reverse()
+            speed = (-1)*speed*self.speed_const_right
+            speed = round(speed)
+            gpio.enb_pwm(speed)
+        
+        return speed
 
-	def set_speed_cms_left(self,speed):
-		if (speed > 0):
-			self.m1m2_forward()
-			speed = speed*self.speed_const_left
-			gpio.ena_pwm(speed)
-		else:
-			self.m1m2_reverse()
-			
-			speed = (-1)*speed*self.speed_const_left
-			gpio.ena_pwm(speed)
-	
-	def set_speed_cms_right(self,speed):
-		if (speed > 0):
-			self.m3m4_forward()
-			speed = speed*self.speed_const_right
-			speed = round(speed)
-			gpio.enb_pwm(speed)
-		else:
-			self.m3m4_reverse()
-			speed = (-1)*speed*self.speed_const_right
-			speed = round(speed)
-			gpio.enb_pwm(speed)
+    def __init__(self):
+        self.speed_const_left = 1
+        self.speed_const_right = 1
 
-	def __init__(self):
-		self.speed_const_left = 1
-		self.speed_const_right = 1
+    def set_speed(self, num, speed):
+        """
+        设置电机速度，num表示左侧还是右侧，等于1表示左侧，等于右侧，speed表示设定的速度值（0-100）
+        """
+        # print(speed)
+        if num == 1:  # 调节左侧
+            gpio.ena_pwm(speed)
+        elif num == 2:  # 调节右侧
+            gpio.enb_pwm(speed)
 
-	def set_speed(self, num, speed):
-		"""
-		设置电机速度，num表示左侧还是右侧，等于1表示左侧，等于右侧，speed表示设定的速度值（0-100）
-		"""
-		# print(speed)
-		if num == 1:  # 调节左侧
-			gpio.ena_pwm(speed)
-		elif num == 2:  # 调节右侧
-			gpio.enb_pwm(speed)
+    def motor_init(self):
+        """
+        Получите скорость хранения данных роботом
+        """
+        print("Получите скорость хранения данных роботом")
+        speed = cfgparser.get_data('motor', 'speed')
+        cfg.LEFT_SPEED = speed[0]
+        cfg.RIGHT_SPEED = speed[1]
+        print(speed[0])
+        print(speed[1])
 
-	def motor_init(self):
-		"""
-		Получите скорость хранения данных роботом
-		"""
-		print("Получите скорость хранения данных роботом")
-		speed = cfgparser.get_data('motor', 'speed')
-		cfg.LEFT_SPEED = speed[0]
-		cfg.RIGHT_SPEED = speed[1]
-		print(speed[0])
-		print(speed[1])
+    def save_speed(self):
+        speed = [0, 0]
+        speed[0] = cfg.LEFT_SPEED
+        speed[1] = cfg.RIGHT_SPEED
+        cfgparser.save_data('motor', 'speed', speed)
 
-	def save_speed(self):
-		speed = [0, 0]
-		speed[0] = cfg.LEFT_SPEED
-		speed[1] = cfg.RIGHT_SPEED
-		cfgparser.save_data('motor', 'speed', speed)
+    def m1m2_forward(self):
+        # 设置电机组M1、M2正转
+        gpio.digital_write(gpio.IN1, True)
+        gpio.digital_write(gpio.IN2, False)
 
-	def m1m2_forward(self):
-		# 设置电机组M1、M2正转
-		gpio.digital_write(gpio.IN1, True)
-		gpio.digital_write(gpio.IN2, False)
+    def m1m2_reverse(self):
+        # 设置电机组M1、M2反转
+        gpio.digital_write(gpio.IN1, False)
+        gpio.digital_write(gpio.IN2, True)
 
-	def m1m2_reverse(self):
-		# 设置电机组M1、M2反转
-		gpio.digital_write(gpio.IN1, False)
-		gpio.digital_write(gpio.IN2, True)
+    def m1m2_stop(self):
+        # 设置电机组M1、M2停止
+        gpio.digital_write(gpio.IN1, False)
+        gpio.digital_write(gpio.IN2, False)
 
-	def m1m2_stop(self):
-		# 设置电机组M1、M2停止
-		gpio.digital_write(gpio.IN1, False)
-		gpio.digital_write(gpio.IN2, False)
+    def m3m4_forward(self):
+        # 设置电机组M3、M4正转
+        gpio.digital_write(gpio.IN3, True)
+        gpio.digital_write(gpio.IN4, False)
 
-	def m3m4_forward(self):
-		# 设置电机组M3、M4正转
-		gpio.digital_write(gpio.IN3, True)
-		gpio.digital_write(gpio.IN4, False)
+    def m3m4_reverse(self):
+        # 设置电机组M3、M4反转
+        gpio.digital_write(gpio.IN3, False)
+        gpio.digital_write(gpio.IN4, True)
 
-	def m3m4_reverse(self):
-		# 设置电机组M3、M4反转
-		gpio.digital_write(gpio.IN3, False)
-		gpio.digital_write(gpio.IN4, True)
+    def m3m4_stop(self):
+        # 设置电机组M3、M4停止
+        gpio.digital_write(gpio.IN3, False)
+        gpio.digital_write(gpio.IN4, False)
 
-	def m3m4_stop(self):
-		# 设置电机组M3、M4停止
-		gpio.digital_write(gpio.IN3, False)
-		gpio.digital_write(gpio.IN4, False)
+    def forward(self):
+        """
+        设置机器人运动方向为前进
+        """
+        self.set_speed(1, cfg.LEFT_SPEED)
+        self.set_speed(2, cfg.RIGHT_SPEED)
+        self.m1m2_forward()
+        self.m3m4_forward()
 
-	def forward(self):
-		"""
-		设置机器人运动方向为前进
-		"""
-		self.set_speed(1, cfg.LEFT_SPEED)
-		self.set_speed(2, cfg.RIGHT_SPEED)
-		self.m1m2_forward()
-		self.m3m4_forward()
+    def back(self):
+        """
+        #设置机器人运动方向为后退
+        """
+        self.set_speed(1, cfg.LEFT_SPEED)
+        self.set_speed(2, cfg.RIGHT_SPEED)
+        self.m1m2_reverse()
+        self.m3m4_reverse()
 
-	def back(self):
-		"""
-		#设置机器人运动方向为后退
-		"""
-		self.set_speed(1, cfg.LEFT_SPEED)
-		self.set_speed(2, cfg.RIGHT_SPEED)
-		self.m1m2_reverse()
-		self.m3m4_reverse()
+    def left(self):
+        """
+        #设置机器人运动方向为左转
+        """
+        self.set_speed(1, cfg.LEFT_SPEED)
+        self.set_speed(2, cfg.RIGHT_SPEED)
+        self.m1m2_reverse()
+        self.m3m4_forward()
 
-	def left(self):
-		"""
-		#设置机器人运动方向为左转
-		"""
-		self.set_speed(1, cfg.LEFT_SPEED)
-		self.set_speed(2, cfg.RIGHT_SPEED)
-		self.m1m2_reverse()
-		self.m3m4_forward()
+    def right(self):
+        """
+        #设置机器人运动方向为右转
+        """
+        self.set_speed(1, cfg.LEFT_SPEED)
+        self.set_speed(2, cfg.RIGHT_SPEED)
+        self.m1m2_forward()
+        self.m3m4_reverse()
 
-	def right(self):
-		"""
-		#设置机器人运动方向为右转
-		"""
-		self.set_speed(1, cfg.LEFT_SPEED)
-		self.set_speed(2, cfg.RIGHT_SPEED)
-		self.m1m2_forward()
-		self.m3m4_reverse()
-
-	def stop(self):
-		"""
-		#设置机器人运动方向为停止
-		"""
-		self.set_speed(1, 0)
-		self.set_speed(2, 0)
-		self.m1m2_stop()
-		self.m3m4_stop()
+    def stop(self):
+        """
+        #设置机器人运动方向为停止
+        """
+        self.set_speed(1, 0)
+        self.set_speed(2, 0)
+        self.m1m2_stop()
+        self.m3m4_stop()
