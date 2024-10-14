@@ -45,11 +45,11 @@ class RobotDirection(object):
 		if (speed > 0):
 			gpio.digital_write(gpio.IN4, True)
 			speed = speed*self.speed_const_right
-			gpio.ena_pwm(speed)
+			gpio.enb_pwm(speed)
 		else:
 			gpio.digital_write(gpio.IN4, False)
 			speed = (-1)*speed*self.speed_const_right
-			gpio.ena_pwm(speed)
+			gpio.enb_pwm(speed)
 
 	def __init__(self):
 		self.speed_const_left = 1
