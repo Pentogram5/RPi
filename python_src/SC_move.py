@@ -23,15 +23,15 @@ def setDirection(direction, speed):
         setMotor(1, 0, speed)
         setMotor(2, 0, speed)
     elif direction > 0:
-        setMotor(1, abs(direction), speed)
-        setMotor(2, 0, speed)
-    else:
         setMotor(1, 0, speed)
         setMotor(2, abs(direction), speed)
+    else:
+        setMotor(1, abs(direction), speed)
+        setMotor(2, 0, speed)
 
-""""
+'''
+speed = int(input())
 while True:
     direction = float(input())
-    speed = 50
     setDirection(direction, speed)
-"""
+'''
