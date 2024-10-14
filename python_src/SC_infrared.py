@@ -5,9 +5,10 @@ class ScInfrared:
     value = None # Последнее устреднённое значение
     rawValue = None # Последнее значение
     
-    def __init__(self, id, pin, averageCount=10):
+    def __init__(self, id, pin, distance, averageCount=10):
         self.id = id
         self.pin = pin
+        self.distance = distance
         self.averageCount = averageCount
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
@@ -29,4 +30,10 @@ class ScInfrared:
         return self.value
 
     def getSerialise(self):
-        return {'value': self.getNewValue(self)}
+        return {'id': str(self.id),
+                'distance': self.distance,
+                'value': self.getNewValue(self)}
+
+RI_1 = ScInfrared(1, 22, 10)
+RI_2 = ScInfrared(2, 18, 10)
+RI_3 = ScInfrared(3, 27, 10)

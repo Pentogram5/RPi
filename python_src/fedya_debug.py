@@ -1,7 +1,8 @@
-import SC_infrared as I
+from SC_infrared import *
 import time
 
-I1 = I.ScInfrared(1, 18, 100) 
 while True:
-    print(I1.getNewRawValue())
+    print(RI_1.getSerialise())
+    print(RI_2.getSerialise())
+    print(RI_3.getSerialise())
     time.sleep(0.1)
