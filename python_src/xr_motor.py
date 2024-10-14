@@ -28,11 +28,13 @@ cfgparser = HandleConfig(path_data)
 class RobotDirection(object):
 	
 	
+	def set_consts(left,right):
+		self.speed_const_left = left
+		self.speed_const_right = right
 
 	def set_speed_cms_left(self,speed):
 		if (speed > 0):
 			self.m1m2_forward()
-			
 			speed = speed*self.speed_const_left
 			gpio.ena_pwm(speed)
 		else:
@@ -45,10 +47,12 @@ class RobotDirection(object):
 		if (speed > 0):
 			self.m3m4_forward()
 			speed = speed*self.speed_const_right
+			speed = round(speed)
 			gpio.enb_pwm(speed)
 		else:
 			self.m3m4_reverse()
 			speed = (-1)*speed*self.speed_const_right
+			speed = round(speed)
 			gpio.enb_pwm(speed)
 
 	def __init__(self):
