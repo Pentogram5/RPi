@@ -31,23 +31,23 @@ class RobotDirection(object):
 
 	def set_speed_cms_left(self,speed):
 		if (speed > 0):
-			gpio.digital_write(gpio.IN1, True)
+			self.m1m2_forward()
 			
 			speed = speed*self.speed_const_left
 			gpio.ena_pwm(speed)
 		else:
-			gpio.digital_write(gpio.IN1, False)
+			self.m1m2_reverse()
 			
 			speed = (-1)*speed*self.speed_const_left
 			gpio.ena_pwm(speed)
 	
 	def set_speed_cms_right(self,speed):
 		if (speed > 0):
-			gpio.digital_write(gpio.IN4, True)
+			self.m3m4_forward()
 			speed = speed*self.speed_const_right
 			gpio.enb_pwm(speed)
 		else:
-			gpio.digital_write(gpio.IN4, False)
+			self.m3m4_reverse()
 			speed = (-1)*speed*self.speed_const_right
 			gpio.enb_pwm(speed)
 
