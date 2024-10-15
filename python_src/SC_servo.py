@@ -39,7 +39,8 @@ class ScServo:
         count = 0
         while True:
             for key in trajectory.keys():
-                if trajectory[key]:
+                print(type(trajectory[key]))
+                if type(trajectory[key]) == 'numpy.ndarray':
                     try:
                         angle = trajectory[key][count]
                         servo.set(key, angle)
