@@ -46,8 +46,8 @@ class ScServo:
             for key in trajectory.keys():
                 if count < len(trajectory[key]):
                     angle = trajectory[key][count]
-                    self.send(key, angle)
-                    print(key, angle)
+                    self.send(int(key), int(angle))
+                    print(int(key), int(angle))
                     f = True
                 else:
                     self.currentState[key] = trajectory[key][-1]
