@@ -3,7 +3,9 @@ from SC_infrared import IR_R, IR_G, IR_B
 from SC_fakemotor import RobotDirection
 from SC_ultrasonic import ULTRASONIC
 from SC_actions import perform_action_capture, perform_action_report, perform_action_throw_to_basket
+from SC_head import look_forward, look_diagonal, look_down
 from aiohttp import web
+import time
 import json
 
 rd = None
@@ -37,6 +39,7 @@ async def handle_set_speed(request):
     # print('NIGGER')
     direction = request.match_info['direction']
     cms_str = request.query.get('cms')
+    time.sleep(0)
     
     if cms_str is not None:
         try:
@@ -64,22 +67,45 @@ async def handle_action_capture(request):
     if result:
         return web.json_response({"result":"action perform succeeded"})
     else:
-        return web.json_response({"error": "cms parameter is required"}, status=400)
+        return web.json_response({"error": "action failed"}, status=400)
 
 async def handle_action_report(request):
     result = perform_action_report()
     if result:
         return web.json_response({"result":"action perform succeeded"})
     else:
-        return web.json_response({"error": "cms parameter is required"}, status=400)
+        return web.json_response({"error": "action failed"}, status=400)
 
 async def handle_action_throw_to_basket(request):
     result = perform_action_throw_to_basket()
     if result:
         return web.json_response({"result":"action perform succeeded"})
     else:
-        return web.json_response({"error": "cms parameter is required"}, status=400)
+        return web.json_response({"error": "action failed"}, status=400)
 
+
+async def handle_look(request):
+    direction = request.match_info['direction']
+    if not direction:
+        return web.json_response({"error": "direction is inappropriate"})
+    
+    angle = None
+    if   direction=='forward' :
+        angle = look_forward()
+    elif direction=='diagonal':
+        angle = look_diagonal()
+    elif direction=='down'    :
+        angle = look_down()
+    else:
+        return web.json_response({"error": "direction is inappropriate"})
+    
+    print(angle)    
+    if angle is not None:
+        return web.json_response({"angle":float(angle)})
+    else:
+        return web.json_response({"error": "moving failed"}, status=400)
+    
+    
 
 app = web.Application()
 
@@ -90,6 +116,8 @@ app.router.add_get('/set_speed_cms_{direction}', handle_set_speed)  # Для set
 app.router.add_get('/perform_action_capture', handle_action_capture)  # действие захвата
 app.router.add_get('/perform_action_report' , handle_action_report )  # действие отчёта о положении предмета на базу
 app.router.add_get('/perform_action_throw_to_basket', handle_action_throw_to_basket)  # действие бросания 
+
+app.router.add_get('/perform_look_{direction}' , handle_look  )  # действие поворота камеры
 
 if __name__ == '__main__':
     init()
