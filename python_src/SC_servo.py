@@ -25,7 +25,7 @@ class ScServo:
                   2: {'time': 1, 'stopAngle': 180},
                   3: {'time': 1, 'stopAngle': 95},
                   4: {'time': 1, 'stopAngle': 50}}
-    catch = {4: {'time': 1, 'stopAngle': 50}}
+    catch = {4: {'time': 1, 'stopAngle': 100}}
 
     # Рассчёт плавной траектории. Время траветории в секундах, начальный угол, конечный угол
     def calcSmothMove(self, time, startAngle, stopAngle):
