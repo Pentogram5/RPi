@@ -30,37 +30,65 @@ class RobotDirection(object):
 	def set_consts(self,left,right):
 		self.speed_const_left = left
 		self.speed_const_right = right
-
+	#МАКСИМАЛЬНАЯ СКОРОСТЬ 46 МИН/С	(self.a*100 + self.b)
+	#МИНИМАЛЬНАЯ СКОРОСТЬ  10 МИН/С (self.b+1)
 	def set_speed_cms_left(self,speed):
+		flag = 0
 		if (speed > 0):
+			flag = 1
+		elif ( (speed<=9) and (speed>=0) ):
+			speed = self.b
+			flag = 0
+		else:
+			flag = -1
+			speed = (-1)*speed
+		
+		speed = speed*self.speed_const_left
+		speed = round((speed-self.b)/self.a)
+		if speed > 100: speed = 100
+		if speed < 0: speed = 0 
+		
+		if (flag > 0):
 			self.m1m2_forward()
-			speed = speed*self.speed_const_left
+
 			gpio.ena_pwm(speed)
-		elif (speed == 0):
+		elif (flag == 0):
 			self.m1m2_stop()
 		else:
 			self.m1m2_reverse()
-			
-			speed = (-1)*speed*self.speed_const_left
+
 			gpio.ena_pwm(speed)
 	
 	def set_speed_cms_right(self,speed):
+		flag = 0
+		if (speed > 0):
+			flag = 1
+		elif ( (speed<=9) and (speed>=0) ):
+			speed = self.b
+			flag = 0
+		else:
+			flag = -1
+			speed = (-1)*speed
+		
+		speed = speed*self.speed_const_right
+		speed = round((speed-self.b)/self.a)
+		if speed > 100: speed = 100
+		if speed < 0: speed = 0 
+	
 		if (speed > 0):
 			self.m3m4_forward()
-			speed = speed*self.speed_const_right
-			speed = round(speed)
 			gpio.enb_pwm(speed)
 		elif (speed == 0):
 			self.m3m4_stop()
 		else:
 			self.m3m4_reverse()
-			speed = (-1)*speed*self.speed_const_right
-			speed = round(speed)
 			gpio.enb_pwm(speed)
 
 	def __init__(self):
 		self.speed_const_left = 1
 		self.speed_const_right = 1
+		self.a = 0.37
+		self.b = 9
 
 	def set_speed(self, num, speed):
 		"""
