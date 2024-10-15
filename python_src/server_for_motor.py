@@ -25,9 +25,9 @@ class RobotControlServer:
         speed_right = int(command[1]) 
         robot.set_speed_cms_left(speed_left)
         robot.set_speed_cms_right(speed_right)
-        left_const = float(command[2])
-        right_const = float(command[3])
-        robot.set_consts(left_const,right_const)
+        # left_const = float(command[2])
+        # right_const = float(command[3])
+        # robot.set_consts(left_const,right_const)
 
     def start(self):
         while True:
