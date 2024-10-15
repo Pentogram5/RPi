@@ -41,7 +41,7 @@ class ScServo:
         while f:
             f = False
             for key in trajectory.keys():
-                if count <= len(trajectory[key]):
+                if count < len(trajectory[key]):
                     angle = trajectory[key][count]
                     servo.set(key, angle)
                     print(angle)
