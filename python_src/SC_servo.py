@@ -50,5 +50,5 @@ class ScServo:
                     self.currentState[key] = trajectory[key][-1]
             count += 1
             print(count)
-            time.sleep(0.01)
+            time.sleep(1 / self.samplingRate)
             
