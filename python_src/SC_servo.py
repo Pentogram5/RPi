@@ -9,7 +9,7 @@ import time
 
 
 class ScServo:
-    samplingRate = 5
+    samplingRate = 2
     currentState = {1: 90,
                     2: 90,
                     3: 90,
@@ -46,8 +46,7 @@ class ScServo:
             for key in trajectory.keys():
                 if count < len(trajectory[key]):
                     angle = trajectory[key][count]
-                    buf = [0xff, 0x01, servonum, angle, 0xff]
-                    i2c.writedata(i2c.mcu_address, buf)
+                    self.send(key, angle)
                     print(key, angle)
                     f = True
                 else:

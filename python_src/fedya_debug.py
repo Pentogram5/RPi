@@ -10,8 +10,6 @@ while True:
     print(state)
     T = S.calcTrajectory(state)
     print(T)
-    for i in T[1]:
-        servo.set(servo1, i)
-        time.sleep(1 / 5)
-        print(servo1, i)
+    S.executeTrajectory(T)
+    print(S.currentState)
 
