@@ -30,9 +30,9 @@ class ScServo:
     def calcTrajectory(self, endState):
         trajectory = endState.copy()
         for key in endState.keys():
-            trajectory[key] = self.calcSmothMove(self.expeditionState[key]['time'],
+            trajectory[key] = self.calcSmothMove(endState[key]['time'],
                                                  self.currentState[key],
-                                                 self.expeditionState[key]['stopAngle'])
+                                                 endState[key]['stopAngle'])
         return trajectory
     
     def executeTrajectory(self, trajectory):
