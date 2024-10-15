@@ -5,7 +5,8 @@ servo.set(1, 90)
 S = ScServo()
 
 while True:
-    servo1, t, angle = map(int, input().split())
+    d, servo1, t, angle = map(int, input().split())
+    S.samplingRate = d
     state = {servo1: {'time': t, 'stopAngle': angle}}
     print(state)
     T = S.calcTrajectory(state)
