@@ -9,7 +9,7 @@ import time
 
 
 class ScServo:
-    samplingRate = 2
+    samplingRate = 100
     currentState = {1: 90,
                     2: 90,
                     3: 90,
