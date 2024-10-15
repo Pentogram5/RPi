@@ -27,6 +27,8 @@ while True:
         S.executeTrajectory(S.calcTrajectory(S.catchState))
     elif inp == 'e':
         S.executeTrajectory(S.calcTrajectory(S.expeditionState))
+    elif inp == 'v':
+        S.executeTrajectory(S.calcTrajectory(S.catch))
     elif inp == 'set c':
         while True:
             n, t = int(input()), float(input())
