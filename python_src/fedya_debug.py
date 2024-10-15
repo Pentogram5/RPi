@@ -1,6 +1,5 @@
 from SC_servo import *
 import time
-servo.set(1, 90)
 
 S = ScServo()
 
