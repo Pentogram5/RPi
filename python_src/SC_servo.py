@@ -48,9 +48,7 @@ class ScServo:
                     f = True
                 else:
                     self.currentState[key] = trajectory[key][-1]
-                    break
-            else:
-                break
             count += 1
+            print(count)
             time.sleep(0.01)
             
