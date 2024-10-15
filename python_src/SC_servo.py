@@ -44,9 +44,11 @@ class ScServo:
                         angle = trajectory[key][count]
                         servo.set(key, angle)
                     except:
+                        self.currentState[key] = trajectory[key][-1]
                         trajectory[key] = None
                     count += 1
                     break
             else:
                 break
             time.sleep(1 / self.samplingRate)
+            

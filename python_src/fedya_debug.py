@@ -9,4 +9,6 @@ while True:
     print(state)
     T = S.calcTrajectory(state)
     print(T)
+    S.executeTrajectory(T)
+    print(S.currentState)
 
