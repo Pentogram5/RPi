@@ -4,8 +4,8 @@ import time
 S = ScServo()
 
 while True:
-    servo, t, angle = map(int, input().split())
-    state = {servo: {'time': t, 'stopAngle': angle}}
+    servo1, t, angle = map(int, input().split())
+    state = {servo1: {'time': t, 'stopAngle': angle}}
     print(state)
     T = S.calcTrajectory(state)
     print(T)
