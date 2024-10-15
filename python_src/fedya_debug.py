@@ -5,7 +5,10 @@ servo.set(1, 90)
 S = ScServo()
 
 while True:
-    d, servo1, t, angle = map(int, input().split())
+    d, servo1, t, angle = map(float, input().split())
+    d = int(d)
+    servo1 = int(servo1)
+    angle = int(angle)
     begintime = time.time()
     S.samplingRate = d
     state = {servo1: {'time': t, 'stopAngle': angle}}
