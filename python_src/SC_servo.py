@@ -37,14 +37,17 @@ class ScServo:
     
     def executeTrajectory(self, trajectory):
         count = 0
-        while True:
+        f = True
+        while f:
+            f = False
             for key in trajectory.keys():
                 if count <= len(trajectory[key]):
                     angle = trajectory[key][count]
                     servo.set(key, angle)
+                    f = True
                 else:
                     self.currentState[key] = trajectory[key][-1]
-                break
+                    break
             else:
                 break
             count += 1
