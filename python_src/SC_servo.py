@@ -51,4 +51,3 @@ class ScServo:
             count += 1
             print(count)
             time.sleep(1 / self.samplingRate)
-            

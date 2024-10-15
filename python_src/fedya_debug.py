@@ -1,5 +1,6 @@
 from SC_servo import *
 import time
+servo.set(1, 90)
 
 S = ScServo()
 
@@ -9,6 +10,7 @@ while True:
     print(state)
     T = S.calcTrajectory(state)
     print(T)
-    S.executeTrajectory(T)
-    print(S.currentState)
+    for i in T[1]:
+        servo.set(servo1, i)
+        time.sleep(1 / 5)
 
