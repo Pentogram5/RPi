@@ -53,14 +53,14 @@ class ScServo:
             f = False
             for key in trajectory.keys():
                 if count < len(trajectory[key]):
-                    print(int(key), int(angle))
+                    print(int(key))
                     angle = trajectory[key][count]
+                    print(int(angle))
                     self.send(int(key), int(angle))
                     f = True
                 else:
                     self.currentState[key] = trajectory[key][-1]
             count += 1
-            print(count)
             time.sleep(1 / self.samplingRate)
     
     def send(self, servo, angle):
