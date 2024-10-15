@@ -52,5 +52,5 @@ class ScServo:
             else:
                 break
             count += 1
-            time.sleep(1 / self.samplingRate)
+            time.sleep(0.01)
             
