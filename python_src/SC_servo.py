@@ -39,17 +39,15 @@ class ScServo:
         count = 0
         while True:
             for key in trajectory.keys():
-                print(type(trajectory[key]))
-                if type(trajectory[key]) == 'numpy.ndarray':
-                    try:
-                        angle = trajectory[key][count]
-                        servo.set(key, angle)
-                    except:
-                        self.currentState[key] = trajectory[key][-1]
-                        trajectory[key] = None
-                    count += 1
-                    break
+                try:
+                    angle = trajectory[key][count]
+                    servo.set(key, angle)
+                except:
+                    self.currentState[key] = trajectory[key][-1]
+                    trajectory[key] = None
+                break
             else:
                 break
+            count += 1
             time.sleep(1 / self.samplingRate)
             
