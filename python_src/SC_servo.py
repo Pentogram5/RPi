@@ -44,7 +44,7 @@ class ScServo:
                 if count < len(trajectory[key]):
                     angle = trajectory[key][count]
                     servo.set(key, angle)
-                    print(angle)
+                    print(key, angle)
                     f = True
                 else:
                     self.currentState[key] = trajectory[key][-1]
