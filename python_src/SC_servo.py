@@ -33,6 +33,7 @@ class ScServo:
             trajectory[key] = self.calcSmothMove(self.expeditionState[key]['time'],
                                                  self.currentState[key],
                                                  self.expeditionState[key]['stopAngle'])
+        return trajectory
     
     def executeTrajectory(self, trajectory):
         count = 0
