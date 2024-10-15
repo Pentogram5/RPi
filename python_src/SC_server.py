@@ -34,6 +34,7 @@ async def handle_get_ultrasonic_sensor(request):
 
 # Запросы моторов
 async def handle_set_speed(request):
+    # print('NIGGER')
     direction = request.match_info['direction']
     cms_str = request.query.get('cms')
     

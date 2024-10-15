@@ -17,9 +17,10 @@ import json
 class ScInfrared:
     rawValue = 0 # Последнее значение
     filteredValue = 0
+    timestamp = 0
     
     def __init__(self, id='IR_GREEN', pin=22, distance=10, averageCount=10,
-                 rawValue=None, filteredValue=None):
+                 rawValue=None, filteredValue=None, timestamp=None):
         self.id = id
         self.pin = pin
         self.distance = distance
@@ -29,6 +30,8 @@ class ScInfrared:
             self.rawValue = rawValue
         if filteredValue:
             self.filteredValue = filteredValue
+        if timestamp:
+            self.timestamp = timestamp
         # self.ts = TimeStamper()
         # GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
@@ -54,10 +57,11 @@ class ScInfrared:
         return {'id': str(self.id),
                 'distance': self.distance,
                 'rawValue': self.rawValue,
-                'filteredValue': self.filteredValue}
+                'filteredValue': self.filteredValue,
+                'timestamp': time.time_ns()}
     
     @staticmethod    
-    def deserialize(self, json_data):
+    def deserialize(json_data):
         # data = json.loads(json_str)
         data = json_data
         return ScInfrared(
@@ -65,6 +69,7 @@ class ScInfrared:
             distance=data['distance'],
             rawValue=data['rawValue'],
             filteredValue=data['filteredValue'],
+            timestamp=data['timestamp']
         )
     
     def _update_thread(self):
@@ -89,6 +94,12 @@ class ScInfrared:
     def start_update_thread(self):
         self.update_thread = threading.Thread(target=self._update_thread)
         self.update_thread.start()
+    
+    def __repr__(self):
+        return f'ScInfrared({self.id},distance={self.distance},rawValue={self.rawValue},filteredValue={self.filteredValue},timestamp={self.timestamp})'
+
+    def __str__(self):
+        return self.__repr__()
 
 IR_G = ScInfrared('IR_GREEN', 22, 10)
 IR_R = ScInfrared('IR_RED', 18, 10)
