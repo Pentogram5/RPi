@@ -39,7 +39,7 @@ class ScServo:
         count = 0
         while True:
             for key in trajectory.keys():
-                if trajectory[key] != None:
+                if trajectory[key]:
                     try:
                         angle = trajectory[key][count]
                         servo.set(key, angle)
