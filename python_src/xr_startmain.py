@@ -157,25 +157,25 @@ def cruising_mode():
 				if i:
 					for j in range(90, 0, -5):
 						print(j)
-						servo.set(8, j)
+						#servo.set(8, j)
 						time.sleep(0.04)
 					time.sleep(0.1)
-			servo.set(8, 0)
+			#servo.set(8, 0)
 			cfg.VOICE_MOD = cfg.VOICE_MOD_SET['normal']
 		elif cfg.VOICE_MOD == cfg.VOICE_MOD_SET['shakehead']:	 # 请摇头
 			for i in range(1, 3):
 				if i:
 					for j in range(45, 135, 5):
 						# print(j)
-						servo.set(7, j)
+						#servo.set(7, j)
 						time.sleep(0.02)
 					time.sleep(0.1)
 					for j in range(135, 45, -5):
 						# print(j)
-						servo.set(7, j)
+						#servo.set(7, j)
 						time.sleep(0.02)
 					time.sleep(0.1)
-			servo.set(7, 90)
+			#servo.set(7, 90)
 			cfg.VOICE_MOD = cfg.VOICE_MOD_SET['normal']
 
 	else:
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 	time.sleep(0.2)
 	print("now bluetooth discoverable")
 
-	servo.restore()  		# 复位舵机
+	#servo.restore()  		# 复位舵机
 	try:
 		oled.disp_default()		# oled显示初始化信息
 	except:
@@ -272,7 +272,7 @@ for t in threads:
 	time.sleep(0.05)
 # print("theads %s start..." %t)
 print("all theads start...>>>>>>>>>>>>")
-servo.store()		# 恢复小车保存的舵机角度
+#servo.store()		# 恢复小车保存的舵机角度
 go.motor_init()		# 恢复小车保存的电机速度
 while True:
 	'''
