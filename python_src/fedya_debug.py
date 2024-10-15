@@ -13,4 +13,5 @@ while True:
     for i in T[1]:
         servo.set(servo1, i)
         time.sleep(1 / 5)
+        print(servo1, i)
 

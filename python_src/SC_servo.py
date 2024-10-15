@@ -1,6 +1,9 @@
 from xr_servo import Servo
 servo = Servo()
 
+import smbus
+SM = smbus.SMBus(1)
+
 import numpy as np
 import time
 
@@ -43,7 +46,8 @@ class ScServo:
             for key in trajectory.keys():
                 if count < len(trajectory[key]):
                     angle = trajectory[key][count]
-                    servo.set(key, angle)
+                    buf = [0xff, 0x01, servonum, angle, 0xff]
+                    i2c.writedata(i2c.mcu_address, buf)
                     print(key, angle)
                     f = True
                 else:
@@ -51,3 +55,7 @@ class ScServo:
             count += 1
             print(count)
             time.sleep(1 / self.samplingRate)
+    
+    def send(self, servo, angle):
+        values = [0xff, 0x01, servo, angle, 0xff]
+        SM.write_i2c_block_data(0x18, values[0], values[1:len(values)])
