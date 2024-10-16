@@ -7,9 +7,8 @@ S = ScServo()
 import time
 
 def perform_action_capture():
-    S.executeTrajectory(S.calcTrajectory(S.throw))
     S.executeTrajectory(S.calcTrajectory(S.catchState))
-    time.sleep(0.5)
+    time.sleep(0.2)
     S.executeTrajectory(S.calcTrajectory(S.catch))
     time.sleep(0.5)
     S.executeTrajectory(S.calcTrajectory(S.expeditionState))
@@ -20,6 +19,7 @@ def perform_action_report():
     
 def perform_action_throw_to_basket():
     S.executeTrajectory(S.calcTrajectory(S.putState))
+    time.sleep(0.2)
     S.executeTrajectory(S.calcTrajectory(S.throw))
     time.sleep(0.5)
     S.executeTrajectory(S.calcTrajectory(S.expeditionState))
