@@ -3,13 +3,14 @@ import socket
 import threading
 from SC_TCPRequests import StableConnectionServer
 from SC_infrared import IR_R, IR_G, IR_B
-from SC_fakemotor import RobotDirection
+from xr_motor import RobotDirection
 from SC_ultrasonic import ULTRASONIC
 from SC_actions import perform_action_capture, perform_action_report, perform_action_throw_to_basket
 from SC_head import look_forward, look_diagonal, look_down
 from SC_utils import TimeStamper, ThreadRate
+import time
 
-HOST = 'localhost'
+HOST = '0.0.0.0'
 PORT_SENSOR = 8081
 PORT_COMMAND = 8082
 PORT_ACTION = 8083  # Новый порт для действий
@@ -130,9 +131,9 @@ if __name__ == "__main__":
     init()
     
     # Создаем и запускаем три сервера на разных портах
-    sensor_server        = SensorServer(ip='127.0.0.1', port=8081)
-    speed_control_server = SpeedControlServer(ip='127.0.0.1', port=8082)
-    action_server        = ActionServer(ip='127.0.0.1', port=8083)
+    sensor_server        = SensorServer(ip=HOST, port=8081)
+    speed_control_server = SpeedControlServer(ip=HOST, port=8082)
+    action_server        = ActionServer(ip=HOST, port=8083)
 
     sensor_server.start_process_responses()
     speed_control_server.start_process_responses()
@@ -140,7 +141,8 @@ if __name__ == "__main__":
 
     try:
         while True:
-            pass  # Все серверы работают в вечном цикле
+            # pass  # Все серверы работают в вечном цикле
+            time.sleep(1)
     except KeyboardInterrupt:
         print("Stopping servers...")
         sensor_server.stop()

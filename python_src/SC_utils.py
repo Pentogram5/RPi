@@ -18,5 +18,10 @@ class ThreadRate:
         self.ts = TimeStamper()
 
     def sleep(self):
+        # print(self._period - self.ts.timestamp())
         sleep_time = max(self._period - self.ts.timestamp(), 0)
         time.sleep(sleep_time)
+        return sleep_time
+
+    def get_sleep_time(self):
+        return max(self._period - self.ts.timestamp(), 0)
