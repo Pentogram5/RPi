@@ -2,6 +2,8 @@ import threading
 import time
 # import RPi.GPIO as GPIO
 import json
+
+from SC_utils import ThreadRate
 # GPIO.setmode(GPIO.BCM)
 
 # class TimeStamper:
@@ -20,7 +22,8 @@ class ScUltrasonic:
     timestamp = 0
     
     def __init__(self, id='ULTRASONIC', pin=22, distance=10, averageCount=10,
-                 rawValue=None, filteredValue=None, timestamp=None):
+                 rawValue=None, filteredValue=None, timestamp=None,
+                 update_rate=30):
         self.id = id
         self.pin = pin
         self.distance = distance
@@ -34,6 +37,7 @@ class ScUltrasonic:
             self.timestamp = timestamp
         # self.ts = TimeStamper()
         # GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        self.tr = ThreadRate(update_rate)
 
     def getNewRawValue(self):
         # self.rawValue = GPIO.input(self.pin)
@@ -77,7 +81,7 @@ class ScUltrasonic:
             self.filteredValue = self._filter_value(val)
             # print(self.filteredValue)
             # print(self.id,self.ts.timestamp())
-            time.sleep(0)
+            self.tr.sleep()
     
     def _filter_value(self, new_value):
         # Добавляем новое значение в список
