@@ -93,6 +93,7 @@ class ScUltrasonic:
             # self.averageCount
             val = self.getNewRawValue()
             self.filteredValue = self._filter_value(val)
+            # print(self.filteredValue)
             # self.filteredValue = self.ultrasonic.get_kalman_dist()
             # print(self.filteredValue)
             # print(self.id,self.ts.timestamp())
@@ -103,7 +104,7 @@ class ScUltrasonic:
         #self.values.append(new_value)
 
         # Удаляем старые значения, если их больше чем averageCount
-       # if len(self.values) > self.averageCount:
+        # if len(self.values) > self.averageCount:
         #    self.values.pop(0)
 
         # Вычисляем среднее значение

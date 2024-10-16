@@ -111,26 +111,27 @@ class Ultrasonic(object):
 				break
 		t2 = time.time()  # 记录Echo引脚高电平结束时间点
 		distance = (t2 - t1) * 340 / 2 * 100  # Echo引脚高电平持续时间就是超声波由发射到返回的时间，即用时间x声波速度/2等于单程即超声波距物体距离值
+		# print(distance)
 
-		if distance < 500:
-			cfg.DISTANCE = 0
-			return cfg.DISTANCE
+		# if distance < 500:
+		# 	cfg.DISTANCE = 0
+		# 	return cfg.DISTANCE
 
-		else:
-			x_predicted = self.F * self.x + self.B * self.u
-			p_predicted = self.F * self.p * self.F + self.Q
+		# else:
+		x_predicted = self.F * self.x + self.B * self.u
+		p_predicted = self.F * self.p * self.F + self.Q
 
-			# measurement update
-			y = distance - (self.H * x_predicted)
+		# measurement update
+		y = distance - (self.H * x_predicted)
 
-			# kalman estimation   
-			s = self.H * p_predicted * self.H + self.R
-			K = p_predicted * self.H * (1 / s)
-			self.x = x_predicted + (K * y)
-			self.p = (1 - (K * self.H)) * p_predicted
-			
-			cfg.DISTANCE = self.x
-			return cfg.DISTANCE
+		# kalman estimation   
+		s = self.H * p_predicted * self.H + self.R
+		K = p_predicted * self.H * (1 / s)
+		self.x = x_predicted + (K * y)
+		self.p = (1 - (K * self.H)) * p_predicted
+		
+		cfg.DISTANCE = self.x
+		return cfg.DISTANCE
 
 	def avoidbyragar(self):
 		"""

@@ -4,10 +4,12 @@
 from SC_servo import *
 S = ScServo()
 
-time
+import time
 
 def perform_action_capture():
+    S.executeTrajectory(S.calcTrajectory(S.throw))
     S.executeTrajectory(S.calcTrajectory(S.catchState))
+    time.sleep(0.5)
     S.executeTrajectory(S.calcTrajectory(S.catch))
     time.sleep(0.5)
     S.executeTrajectory(S.calcTrajectory(S.expeditionState))
