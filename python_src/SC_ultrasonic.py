@@ -1,8 +1,11 @@
 import threading
 import time
-# import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import json
 from SC_utils import ThreadRate
+from xr_ultrasonic import Ultrasonic
+
+
 # GPIO.setmode(GPIO.BCM)
 
 # class TimeStamper:
@@ -32,7 +35,7 @@ class ScUltrasonic:
         self.H = 1.
         self.Q = 0.00001
         self.R = 0.10071589
-        
+        self.ultrasonic = Ultrasonic()        
         self.id = id
         self.pin = pin
         self.distance = distance
@@ -50,7 +53,9 @@ class ScUltrasonic:
 
     def getNewRawValue(self):
         # self.rawValue = GPIO.input(self.pin)
-        self.rawValue = (self.rawValue+1) % 100
+        # self.rawValue = (self.rawValue+1) % 100
+        # return self.rawValue
+        self.rawValue = self.ultrasonic.get_distance()
         return self.rawValue
     
     def getRawValue(self):
@@ -88,6 +93,7 @@ class ScUltrasonic:
             # self.averageCount
             val = self.getNewRawValue()
             self.filteredValue = self._filter_value(val)
+            # self.filteredValue = self.ultrasonic.get_kalman_dist()
             # print(self.filteredValue)
             # print(self.id,self.ts.timestamp())
             self.tr.sleep()
@@ -104,17 +110,18 @@ class ScUltrasonic:
         #return sum(self.values) / len(self.values)
         
         #filter
-        x_predicted = self.F * self.x + self.B * self.u
-        p_predicted = self.F * self.p * self.F + self.Q
+        # x_predicted = self.F * self.x + self.B * self.u
+        # p_predicted = self.F * self.p * self.F + self.Q
 
-        # measurement update
-        y = new_value - (self.H * x_predicted)
+        # # measurement update
+        # y = new_value - (self.H * x_predicted)
 
-        # kalman estimation   
-        s = self.H * p_predicted * self.H + self.R
-        K = p_predicted * self.H * (1 / s)
-        self.x = x_predicted + (K * y)
-        return self.x 
+        # # kalman estimation   
+        # s = self.H * p_predicted * self.H + self.R
+        # K = p_predicted * self.H * (1 / s)
+        # self.x = x_predicted + (K * y)
+        # return self.x 
+        return self.ultrasonic.get_kalman_dist()
     
         
         

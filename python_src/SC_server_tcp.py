@@ -71,6 +71,7 @@ class SpeedControlServer(StableConnectionServer):
         global rd
         lcms = json_request.get("lcms")
         rcms = json_request.get("rcms")
+        # print(rcms)
         rd.set_speed_cms_left (lcms)
         rd.set_speed_cms_right(rcms)
         
