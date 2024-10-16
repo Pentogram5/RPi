@@ -14,13 +14,16 @@ import json
 #         return dt
 # ts = TimeStamper()
 
+from SC_utils import ThreadRate
+
 class ScInfrared:
     rawValue = 0 # Последнее значение
     filteredValue = 0
     timestamp = 0
     
     def __init__(self, id='IR_GREEN', pin=22, distance=10, averageCount=10,
-                 rawValue=None, filteredValue=None, timestamp=None):
+                 rawValue=None, filteredValue=None, timestamp=None,
+                 update_rate=30):
         self.id = id
         self.pin = pin
         self.distance = distance
@@ -34,6 +37,7 @@ class ScInfrared:
             self.timestamp = timestamp
         # self.ts = TimeStamper()
         # GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        self.tr = ThreadRate(update_rate)
 
     def getNewRawValue(self):
         # self.rawValue = GPIO.input(self.pin)
@@ -78,7 +82,7 @@ class ScInfrared:
             val = self.getNewRawValue()
             self.filteredValue = self._filter_value(val)
             # print(self.id,self.ts.timestamp())
-            time.sleep(0)
+            self.tr.sleep()
     
     def _filter_value(self, new_value):
         # Добавляем новое значение в список
