@@ -26,7 +26,7 @@ class ScServo:
                   3: {'time': 0.5, 'stopAngle': 95},
                   4: {'time': 0.25, 'stopAngle': 50}}
     putState = {1: {'time': 0.7, 'stopAngle': 70},
-                  2: {'time': 0.35, 'stopAngle': 100},
+                  2: {'time': 0.35, 'stopAngle': 130},
                   3: {'time': 0.5, 'stopAngle': 95}}
     catch = {4: {'time': 0.25, 'stopAngle': 100}}
     throw = {4: {'time': 0.25, 'stopAngle': 50}}
