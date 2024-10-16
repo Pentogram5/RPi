@@ -17,11 +17,11 @@ class ScServo:
                     5: 90,
                     6: 90
                     }
-    expeditionState = {1: {'time': 1, 'stopAngle': 190},
+    expeditionState = {1: {'time': 1, 'stopAngle': 150},
                        2: {'time': 1, 'stopAngle': 35},
                        3: {'time': 1, 'stopAngle': 95},
                        4: {'time': 1, 'stopAngle': 100}}
-    catchState = {1: {'time': 1, 'stopAngle': 75},
+    catchState = {1: {'time': 1, 'stopAngle': 0},
                   2: {'time': 1, 'stopAngle': 180},
                   3: {'time': 1, 'stopAngle': 95},
                   4: {'time': 1, 'stopAngle': 50}}
