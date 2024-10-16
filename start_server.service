@@ -1,0 +1,12 @@
+[Unit]
+Description=Launcher the python server of SC
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=sudo bash /home/pi/work/python_src/run_server.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
