@@ -1,19 +1,19 @@
-import socket
 import json
+import socket
 import threading
-import time
+from SC_TCPRequests import StableConnectionServer
 from SC_infrared import IR_R, IR_G, IR_B
 from SC_fakemotor import RobotDirection
 from SC_ultrasonic import ULTRASONIC
 from SC_actions import perform_action_capture, perform_action_report, perform_action_throw_to_basket
 from SC_head import look_forward, look_diagonal, look_down
-from SC_utils import *
+from SC_utils import TimeStamper, ThreadRate
 
 HOST = 'localhost'
 PORT_SENSOR = 8081
 PORT_COMMAND = 8082
 PORT_ACTION = 8083  # Новый порт для действий
-UPDATE_RATE = 30  # Частота в Гц
+# UPDATE_RATE = 30  # Частота в Гц
 
 rd = None
 
@@ -26,6 +26,7 @@ def init():
     rd = RobotDirection()
 
 def serialize_sensors():
+    # print(IR_G)
     return {
         "IR_G": IR_G.serialize(),
         "IR_R": IR_R.serialize(),
@@ -33,175 +34,115 @@ def serialize_sensors():
         "ULTRASONIC": ULTRASONIC.serialize()
     }
 
-def handle_sensor_client(conn):
-    rate_limiter = ThreadRate(UPDATE_RATE)
-    while True:
-        try:
-            data = json.dumps(serialize_sensors())
-            conn.sendall(data.encode('utf-8'))
-            rate_limiter.sleep()  # Сохраняем фиксированную частоту обновления
-        except (ConnectionResetError, BrokenPipeError):
-            print("Sensor client disconnected.")
-            break
-    conn.close()
+class SensorServer(StableConnectionServer):
+    def __init__(self, ip='127.0.0.1', port=8081):
+        super().__init__(ip, port)
+        self.sensors_data = serialize_sensors()
 
-def parse_json_from_buffer(buffer):
-    json_objects = []
-    last_valid_json = None  # Keep track of the last valid JSON object
-    start_index = 0  # Initialize the starting index for searching
+    def process_response(self, json_request):
+        request_name = json_request.get("request_name")
+        if request_name == "get_sensors":
+            return self.get_sensors()
+        else:
+            return {"response_code": 400, "response_msg": "Unknown request"}
 
-    while True:
-        try:
-            # Find the next opening brace
-            start_index = buffer.index('{', start_index)
-            open_braces = 1  # Counter for nested braces
-            
-            # Find the corresponding closing brace
-            end_index = start_index + 1
-            while open_braces > 0 and end_index < len(buffer):
-                if buffer[end_index] == '{':
-                    open_braces += 1
-                elif buffer[end_index] == '}':
-                    open_braces -= 1
-                end_index += 1
-            
-            # If we found a complete object, extract it
-            if open_braces == 0:
-                json_str = buffer[start_index:end_index]  # Extract complete JSON string
-                json_objects.append(json.loads(json_str))  # Parse and append to the list
-                last_valid_json = json.loads(json_str)  # Update last valid JSON
-                
-                # Move the starting index past this object for further searching
-                start_index = end_index
-            else:
-                break  # Exit if we didn't find a complete object
-            
-        except (ValueError, json.JSONDecodeError):
-            # If we can't find another opening brace or if there's an error in decoding, break out of the loop
-            break
+    def get_sensors(self):
+        self.sensors_data = serialize_sensors()
+        return {
+            "response_code": 200,
+            "response_msg": "Sensors data retrieved successfully",
+            "sensors": self.sensors_data
+        }
 
-    return last_valid_json  # Return parsed objects, remaining buffer, and last valid JSON
 
-def handle_command_client(conn):
-    buffer = ""
-    
-    while True:
-        try:
-            data = conn.recv(1024).decode('utf-8')
-            if not data:
-                print("No data received. Client may have disconnected.")
-                break
-            
-            buffer += data
-            
-            # Пытаемся распарсить полные JSON-объекты из буфера
-            while True:
-                try:
-                    command = parse_json_from_buffer(buffer)
-                    buffer = ""  # Очищаем буфер после успешного парсинга
-                    execute_command(command)
-                    break  # Выходим из внутреннего цикла для продолжения получения данных
-                except:
-                    break  # Ждем больше данных
+class SpeedControlServer(StableConnectionServer):
+    def __init__(self, ip='127.0.0.1', port=8082):
+        super().__init__(ip, port)
 
-        except (ConnectionResetError, json.JSONDecodeError) as e:
-            print(f"Command client disconnected or error in data: {e}")
-            break
-    
-    conn.close()
+    def process_response(self, json_request):
+        request_name = json_request.get("request_name")
+        if request_name == "set_speed_cms":
+            return self.set_speed_cms(json_request)
+        else:
+            return {"response_code": 400, "response_msg": "Unknown request"}
 
-def handle_action_client(conn):
-    buffer = ""
-    
-    while True:
-        try:
-            data = conn.recv(1024).decode('utf-8')
-            if not data:
-                print("No data received. Client may have disconnected.")
-                break
-            
-            buffer += data
-            
-            # Пытаемся распарсить полные JSON-объекты из буфера
-            while True:
-                try:
-                    action_command = parse_json_from_buffer(buffer)
-                    buffer = ""  # Очищаем буфер после успешного парсинга
-                    execute_action(action_command)
-                    break  # Выходим из внутреннего цикла для продолжения получения данных
-                except:
-                    break  # Ждем больше данных
-
-        except (ConnectionResetError, json.JSONDecodeError) as e:
-            print(f"Action client disconnected or error in data: {e}")
-            break
-    
-    conn.close()
-
-def execute_command(command):
-    if "set_speed" in command:
-        left_speed = command["set_speed"].get("left", 0)
-        right_speed = command["set_speed"].get("right", 0)
-        rd.set_speed_cms_left(left_speed)
-        rd.set_speed_cms_right(right_speed)
-        # print(f"Setting speed - Left: {left_speed}, Right: {right_speed}")
-
-def execute_action(action_command):
-    action = action_command.get("action")
-    if action == "perform_action_capture":
-        result = perform_action_capture()
-        print(f"Capture action result: {result}")
-    elif action == "perform_action_report":
-        result = perform_action_report()
-        print(f"Report action result: {result}")
-    elif action == "perform_action_throw_to_basket":
-        result = perform_action_throw_to_basket()
-        print(f"Throw to basket action result: {result}")
-    elif action == "perform_look_forward":
-        angle = look_forward()
-        # print(f"Look forward angle: {angle}")
-    elif action == "perform_look_diagonal":
-        angle = look_diagonal()
-        print(f"Look diagonal angle: {angle}")
-    elif action == "perform_look_down":
-        angle = look_down()
-        print(f"Look down angle: {angle}")
-
-def start_sensor_server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT_SENSOR))
-        s.listen()
-        print(f"Sensor server listening on {HOST}:{PORT_SENSOR}")
+    def set_speed_cms(self, json_request):
+        global rd
+        lcms = json_request.get("lcms")
+        rcms = json_request.get("rcms")
+        rd.set_speed_cms_left (lcms)
+        rd.set_speed_cms_right(rcms)
         
-        while True:
-            conn, addr = s.accept()
-            print(f"Accepted connection from sensor client: {addr}")
-            threading.Thread(target=handle_sensor_client, args=(conn,)).start()
-
-def start_command_server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT_COMMAND))
-        s.listen()
-        print(f"Command server listening on {HOST}:{PORT_COMMAND}")
+        if lcms is None or rcms is None:
+            return {"response_code": 400, "response_msg": "lcms and rcms must be provided"}
         
-        while True:
-            conn, addr = s.accept()
-            print(f"Accepted connection from command client: {addr}")
-            threading.Thread(target=handle_command_client, args=(conn,)).start()
-
-def start_action_server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT_ACTION))
-        s.listen()
-        print(f"Action server listening on {HOST}:{PORT_ACTION}")
+        # Логика для установки скорости
+        # print(f"Setting speed: left={lcms} cm/s, right={rcms} cm/s")
         
-        while True:
-            conn, addr = s.accept()
-            print(f"Accepted connection from action client: {addr}")
-            threading.Thread(target=handle_action_client, args=(conn,)).start()
+        return {"response_code": 200, "response_msg": "Speed set successfully"}
 
-if __name__ == '__main__':
+ts = TimeStamper()
+
+class ActionServer(StableConnectionServer):
+    def __init__(self, ip='127.0.0.1', port=8083):
+        super().__init__(ip, port)
+
+    def process_response(self, json_request):
+        request_name = json_request.get("request_name")
+        if request_name == "perform_action":
+            return self.perform_action(json_request)
+        else:
+            return {"response_code": 400, "response_msg": "Unknown request"}
+
+    def perform_action(self, json_request):
+        # print(json_request)
+        # print(ts.timestamp())
+        action = json_request.get("atype")
+        
+        if action is None:
+            return {"response_code": 400, "response_msg": "atype must be provided"}
+        
+        # Логика для выполнения действия
+        # print(f"Performing action: {action}")
+        if action == "perform_action_capture":
+            result = perform_action_capture()
+            # print(f"Capture action result: {result}")
+        elif action == "perform_action_report":
+            result = perform_action_report()
+            # print(f"Report action result: {result}")
+        elif action == "perform_action_throw_to_basket":
+            result = perform_action_throw_to_basket()
+            # print(f"Throw to basket action result: {result}")
+        elif action == "perform_look_forward":
+            angle = look_forward()
+            # print(f"Look forward angle: {angle}")
+        elif action == "perform_look_diagonal":
+            angle = look_diagonal()
+            # print(f"Look diagonal angle: {angle}")
+        elif action == "perform_look_down":
+            angle = look_down()
+            # print(f"Look down angle: {angle}")
+        
+        return {"response_code": 200, "response_msg": f"Action {action} performed successfully", "result": f"Action {action} completed"}
+
+
+if __name__ == "__main__":
     init()
-    threading.Thread(target=start_sensor_server).start()
-    threading.Thread(target=start_command_server).start()
-    threading.Thread(target=start_action_server).start()
+    
+    # Создаем и запускаем три сервера на разных портах
+    sensor_server        = SensorServer(ip='127.0.0.1', port=8081)
+    speed_control_server = SpeedControlServer(ip='127.0.0.1', port=8082)
+    action_server        = ActionServer(ip='127.0.0.1', port=8083)
+
+    sensor_server.start_process_responses()
+    speed_control_server.start_process_responses()
+    action_server.start_process_responses()
+
+    try:
+        while True:
+            pass  # Все серверы работают в вечном цикле
+    except KeyboardInterrupt:
+        print("Stopping servers...")
+        sensor_server.stop()
+        speed_control_server.stop()
+        action_server.stop()

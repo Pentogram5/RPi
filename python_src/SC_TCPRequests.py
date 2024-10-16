@@ -2,6 +2,7 @@ import socket
 import json
 import threading
 import queue
+import time
 
 class StableConnectionServer:
     def __init__(self, ip='127.0.0.1', port=5000):
@@ -53,18 +54,20 @@ class StableConnectionClient:
         self.queue = queue.Queue()
         self.is_processing = False
         self.socket = None
+        self.connected = False
         self.connect()
 
     def connect(self):
-        while True:
+        while not self.connected:
             try:
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.connect(self.server_address)
+                self.connected = True
                 print("Connected to server")
-                break
             except ConnectionRefusedError:
                 print("Connection failed, retrying...")
-    
+                time.sleep(1)  # Задержка перед повторной попыткой подключения
+
     def request(self, json_request: dict):
         if not isinstance(json_request, dict) or "request_name" not in json_request:
             raise ValueError("json_request must be a dictionary with at least 'request_name' key")
@@ -84,20 +87,34 @@ class StableConnectionClient:
             try:
                 request_str = json.dumps(json_request)
                 self.socket.sendall(request_str.encode('utf-8'))
-                
+
                 response_data = self.socket.recv(1024)
                 json_response = json.loads(response_data.decode('utf-8'))
-                
+
                 return json_response
+            except (ConnectionResetError, BrokenPipeError):
+                print("Connection lost. Attempting to reconnect...")
+                self.connected = False
+                self.reconnect()
+                return {"response_code": 500, "response_msg": "Connection lost and reconnected."}
             finally:
                 self.is_processing = False
-            
+
             # Обработка очереди после завершения текущего запроса
             while not self.queue.empty():
                 next_request = self.queue.get()
                 response = self._send_request(next_request)
                 if response is not None:
                     return response
+
+    def reconnect(self):
+        while not self.connected:
+            try:
+                time.sleep(1)  # Задержка перед повторной попыткой подключения
+                print("Reconnecting...")
+                self.connect()
+            except Exception as e:
+                print(f"Reconnect attempt failed: {e}")
 
     def close(self):
         if self.socket:
