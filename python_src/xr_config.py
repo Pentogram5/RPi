@@ -98,12 +98,19 @@ RECV_LEN = 5 		# 接收的字符长度
 #BT_SERVER.listen(1)
 
 # TCP服务端参数设置
-try:
-	TCP_SERVER = socket(AF_INET, SOCK_STREAM)
-	TCP_SERVER.bind(('', 2001))		# WIFI绑定2002端口
-	TCP_SERVER.listen(1)
-except:
-	print("Error ebychaya oshibka connection")
+# try:
+# 	TCP_SERVER = socket(AF_INET, SOCK_STREAM)
+# 	TCP_SERVER.bind(('', 2001))		# WIFI绑定2002端口
+# 	TCP_SERVER.listen(1)
+# except:
+# 	print("Error ebychaya oshibka connection")
+def start_connection():
+    try:
+		TCP_SERVER = socket(AF_INET, SOCK_STREAM)
+		TCP_SERVER.bind(('', 2001))		# WIFI绑定2002端口
+		TCP_SERVER.listen(1)
+	except:
+		print("Error ebychaya oshibka connection")
 # PS2手柄按键定义
 PS2_ABLE = False		# PS2手柄是否正常连接标志
 PS2_READ_KEY = 0		# 读取的PS2手柄值
