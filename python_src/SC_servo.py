@@ -19,8 +19,7 @@ class ScServo:
                     }
     expeditionState = {1: {'time': 0.5, 'stopAngle': 150},
                        2: {'time': 0.75, 'stopAngle': 35},
-                       3: {'time': 0.5, 'stopAngle': 95},
-                       4: {'time': 0.5, 'stopAngle': 100}}
+                       3: {'time': 0.5, 'stopAngle': 95}}
     catchState = {1: {'time': 0.7, 'stopAngle': 4},
                   2: {'time': 0.35, 'stopAngle': 185},
                   3: {'time': 0.5, 'stopAngle': 95},
