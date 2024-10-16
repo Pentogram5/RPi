@@ -21,7 +21,7 @@ class ScServo:
                        2: {'time': 0.75, 'stopAngle': 35},
                        3: {'time': 0.5, 'stopAngle': 95},
                        4: {'time': 0.5, 'stopAngle': 100}}
-    catchState = {1: {'time': 0.5, 'stopAngle': 0},
+    catchState = {1: {'time': 0.5, 'stopAngle': 6},
                   2: {'time': 0.5, 'stopAngle': 180},
                   3: {'time': 0.5, 'stopAngle': 95},
                   4: {'time': 0.25, 'stopAngle': 50}}
