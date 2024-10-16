@@ -2,6 +2,7 @@ import threading
 import time
 # import RPi.GPIO as GPIO
 import json
+from SC_utils import ThreadRate
 # GPIO.setmode(GPIO.BCM)
 
 # class TimeStamper:
