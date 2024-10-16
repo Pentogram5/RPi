@@ -86,17 +86,31 @@ class StableConnectionClient:
             self.is_processing = True
             try:
                 request_str = json.dumps(json_request)
+                # Проверка на наличие соединения перед отправкой запроса
+                if not self.connected:
+                    print("Not connected to server. Attempting to reconnect...")
+                    self.reconnect()
+
+                # Отправка запроса
                 self.socket.sendall(request_str.encode('utf-8'))
 
                 response_data = self.socket.recv(1024)
                 json_response = json.loads(response_data.decode('utf-8'))
 
                 return json_response
+
             except (ConnectionResetError, BrokenPipeError):
                 print("Connection lost. Attempting to reconnect...")
                 self.connected = False
+                # Попробуем переподключиться перед возвратом ответа
                 self.reconnect()
-                return {"response_code": 500, "response_msg": "Connection lost and reconnected."}
+                
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                self.connected = False
+                # Попробуем переподключиться перед возвратом ответа
+                self.reconnect()
+                
             finally:
                 self.is_processing = False
 
@@ -110,8 +124,8 @@ class StableConnectionClient:
     def reconnect(self):
         while not self.connected:
             try:
+                print("Attempting to reconnect...")
                 time.sleep(1)  # Задержка перед повторной попыткой подключения
-                print("Reconnecting...")
                 self.connect()
             except Exception as e:
                 print(f"Reconnect attempt failed: {e}")
