@@ -17,40 +17,135 @@
 from builtins import float, object
 
 import os
+import threading
 import xr_gpio as gpio
 import xr_config as cfg
+import time
 
 from xr_configparser import HandleConfig
 path_data = os.path.dirname(os.path.realpath(__file__)) + '/data.ini'
 cfgparser = HandleConfig(path_data)
 
+def sleep_duty_cycle(T, duty):
+    time.sleep(T*duty)
+
+def sleep_free_cycle(T, duty):
+    time.sleep(T*(1-duty))
+    
+def sgn(x):
+    """Return the sign of a float.
+    
+    Args:
+        x (float): The input number.
+
+    Returns:
+        int: -1 if x is negative, 1 if x is positive, 0 if x is zero.
+    """
+    if x > 0:
+        return 1
+    elif x < 0:
+        return -1
+    else:
+        return 0
 
 class RobotDirection(object):
+
+    def __init__(self, fps=3):
+        self.min_speed_out = 10
+        self.min_speed_in  = 20
+        self.base_speed = 100
+        self.k_low_pwm = 7
+        self.T = 1/fps
+        self.advanced_speed_left = 0
+        self.advanced_movement_left  = False
+        
+        self.advanced_speed_right = 0
+        self.advanced_movement_right = False
+        self.start_processing_low_speeds()
+        
+        self.speed_const_left = 1
+        self.speed_const_right = 1
+        self.a = 0.37
+        self.b = 9
 
     def set_consts(self,left,right):
         self.speed_const_left = left
         self.speed_const_right = right
+    
+    def start_processing_low_speeds(self):
+        self.th = threading.Thread(target=self._process_low_speeds_left)
+        self.th.start()
+        self.th = threading.Thread(target=self._process_low_speeds_right)
+        self.th.start()
+    
+    def get_duty_cycle(self, speed):
+        # print(self.__dir__())
+        s_in_abs  = abs(speed) * self.k_low_pwm
+        k_out = self.min_speed_out / self.min_speed_in # from in to out
+        s_out = s_in_abs * k_out
+        cycle = s_out / self.base_speed
+        return min(cycle, 1)
+    
+    def _process_low_speeds_left(self):
+        while True:
+            if self.advanced_movement_left:
+                s = self.advanced_speed_left
+                flag = sgn(s)
+                speed_in = abs(s)
+                duty = self.get_duty_cycle(speed_in)
+                
+                # print(speed_in, duty)
+                self._set_speed_left(flag, self.base_speed)
+                sleep_duty_cycle(self.T, duty)
+                self._set_speed_left(0, 0)
+                sleep_free_cycle(self.T, duty)
+            else:
+                time.sleep(self.T*2)
+    
+    def _process_low_speeds_right(self):
+        while True:
+            if self.advanced_movement_right:
+                s = self.advanced_speed_right
+                flag = sgn(s)
+                speed = abs(s)
+                duty = self.get_duty_cycle(speed)
+                # print(speed, duty)
+                
+                self._set_speed_right(flag, self.base_speed)
+                sleep_duty_cycle(self.T, duty)
+                self._set_speed_right(0, 0)
+                sleep_free_cycle(self.T, duty)
+            else:
+                time.sleep(self.T*2)
+    
+    def get_out_speed(self, cms):
+        cms_abs = abs(cms)
+        cms_sgn = sgn(cms)
+        speed = cms_abs*self.speed_const_left
+        speed = round((speed-self.b)/self.a)
+        return cms_sgn, speed
+        
     #МАКСИМАЛЬНАЯ СКОРОСТЬ 46 МИН/С	(self.a*100 + self.b)
     #МИНИМАЛЬНАЯ СКОРОСТЬ  10 МИН/С (self.b+1)
     def preprocess_speed(self, speed):
+        fl_advanced = False
         flag = 0
-        if (speed > 0):
-            flag = 1
-        elif ( (speed<=9) and (speed>=0) ):
-            speed = self.b
-            flag = 0
-        else:
-            flag = -1
-            speed = (-1)*speed
+        # print(self.__dir__())
+        if ( (abs(speed)<=self.min_speed_in) and (abs(speed)>0) ):
+            fl_advanced = True
+            # flag, speed = speed
+            # speed = self.b
+            # flag = 0
+            return flag, speed, fl_advanced
         
-        speed = speed*self.speed_const_left
-        speed = round((speed-self.b)/self.a)
+        flag, speed = self.get_out_speed(speed)
+        
+        
         if speed > 100: speed = 100
         if speed < 0: speed = 0 
-        return flag, speed
+        return flag, speed, fl_advanced
 
-    def set_speed_cms_left(self,speed):
-        flag, speed = self.preprocess_speed(speed)
+    def _set_speed_left(self, flag, speed):
         if (flag > 0):
             self.m1m2_forward()
             gpio.ena_pwm(speed)
@@ -60,8 +155,7 @@ class RobotDirection(object):
             self.m1m2_reverse()
             gpio.ena_pwm(speed)
     
-    def set_speed_cms_right(self,speed):
-        flag, speed = self.preprocess_speed(speed)
+    def _set_speed_right(self, flag, speed):
         # print(speed)
         if (flag > 0):
             self.m3m4_forward()
@@ -71,12 +165,21 @@ class RobotDirection(object):
         else:
             self.m3m4_reverse()
             gpio.enb_pwm(speed)
-
-    def __init__(self):
-        self.speed_const_left = 1
-        self.speed_const_right = 1
-        self.a = 0.37
-        self.b = 9
+    
+    def set_speed_cms_left(self,speed):
+        # Если не нужно спец движений - устанавливает текущую скорость
+        flag, self.advanced_speed_left, self.advanced_movement_left = self.preprocess_speed(speed)
+        # print(flag, self.advanced_speed_left, self.advanced_movement_left)
+        if not self.advanced_movement_left:
+            self._set_speed_left(flag, self.advanced_speed_left)
+        
+    
+    def set_speed_cms_right(self,speed):
+        # print(speed)
+        flag, self.advanced_speed_right, self.advanced_movement_right = self.preprocess_speed(speed)
+        if not self.advanced_movement_right:
+            self._set_speed_right(flag, self.advanced_speed_right)
+        
 
     def set_speed(self, num, speed):
         """
