@@ -23,15 +23,24 @@ class StableConnectionServer:
             threading.Thread(target=self._handle_client, args=(client_socket,), daemon=True).start()
 
     def _handle_client(self, client_socket):
+        json_response = 0
+        data = 0
         while self.running:
             try:
                 data = client_socket.recv(1024)
                 if not data:
                     break
+                # print(data)
+                # print(data.decode('utf-8'))
+                # print(json.loads(data.decode('utf-8')))
                 json_request = json.loads(data.decode('utf-8'))
                 json_response = self.process_response(json_request)
                 client_socket.sendall(json.dumps(json_response).encode('utf-8'))
             except Exception as e:
+                # print('NIGGER')
+                # print(data)
+                # print(json.dumps(json_response))
+                # print('GIGGER')
                 print(f"Error handling client: {e}")
                 break
         client_socket.close()
