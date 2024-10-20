@@ -12,7 +12,11 @@ def green_light():
     global car_light
     car_light.set_ledgroup(1, 8, 4)
     car_light.set_ledgroup(2, 8, 4)
-    
+
+def off_led():
+    global car_light
+    car_light.set_ledgroup(1, 8, 0)
+    car_light.set_ledgroup(2, 8, 0)
 if __name__=='__main__':
     while True:
         red_light()
