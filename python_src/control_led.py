@@ -6,10 +6,12 @@ car_light = Car_light()
 def red_light():
     global car_light
     car_light.set_ledgroup(1, 8, 1)
+    car_light.set_ledgroup(2, 8, 1)
     
 def green_light():
     global car_light
     car_light.set_ledgroup(1, 8, 4)
+    car_light.set_ledgroup(2, 8, 4)
     
 if __name__=='__main__':
     while True:

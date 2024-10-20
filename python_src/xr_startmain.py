@@ -21,7 +21,7 @@ import time
 import threading
 from threading import Timer
 from subprocess import call
-from xr_car_light import car_light
+#from xr_car_light import car_light
 #car_light = #car_light()
 import xr_config as cfg
 from xr_motor import RobotDirection
@@ -203,9 +203,9 @@ def status():
 				#car_light.right_turn_light()
 			elif cfg.LIGHT_STATUS == cfg.STOP and cfg.LIGHT_LAST_STATUS != cfg.LIGHT_STATUS:	 # 让STOP灯只在一直STOP情况下只执行一次
 				cfg.LIGHT_LAST_STATUS = cfg.LIGHT_STATUS
-				if cfg.LIGHT_OPEN_STATUS == 1:
+				#if cfg.LIGHT_OPEN_STATUS == 1:
 					#car_light.open_light()
-				else:
+				#else:
 					#car_light.close_light()
 		if cfg.LOOPS > 100:  		# 定时器设定的是0.01秒进入一次，大于100表明自增了100次即1秒时间，一些不需要更新太快的数据显示函数可放这里
 			cfg.LOOPS = 0			# 清除LOOPS
