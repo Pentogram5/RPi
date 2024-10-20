@@ -27,8 +27,12 @@ while True:
         S.executeTrajectory(S.calcTrajectory(S.catchState))
     elif inp == 'e':
         S.executeTrajectory(S.calcTrajectory(S.expeditionState))
+    elif inp == 'p':
+        S.executeTrajectory(S.calcTrajectory(S.putState))
     elif inp == 'v':
         S.executeTrajectory(S.calcTrajectory(S.catch))
+    elif inp == 'b':
+        S.executeTrajectory(S.calcTrajectory(S.throw))
     elif inp == 'set c':
         while True:
             n, t = int(input()), float(input())
@@ -41,5 +45,23 @@ while True:
             if n == 0:
                 break
             S.expeditionState[n]['time'] = t
+    elif inp == 'q':
+        while True:
+            try:
+                d, servo1, t, angle = map(float, input().split())
+            except:
+                break
+            d = int(d)
+            servo1 = int(servo1)
+            angle = int(angle)
+            begintime = time.time()
+            S.samplingRate = d
+            state = {servo1: {'time': t, 'stopAngle': angle}}
+            print(state)
+            T = S.calcTrajectory(state)
+            print(T)
+            S.executeTrajectory(T)
+            print(S.currentState)
+            print(time.time() - begintime)
     else:
         break

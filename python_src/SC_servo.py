@@ -17,15 +17,22 @@ class ScServo:
                     5: 90,
                     6: 90
                     }
-    expeditionState = {1: {'time': 1, 'stopAngle': 190},
-                       2: {'time': 1, 'stopAngle': 35},
-                       3: {'time': 1, 'stopAngle': 95},
-                       4: {'time': 1, 'stopAngle': 100}}
-    catchState = {1: {'time': 1, 'stopAngle': 75},
-                  2: {'time': 1, 'stopAngle': 180},
-                  3: {'time': 1, 'stopAngle': 95},
-                  4: {'time': 1, 'stopAngle': 50}}
-    catch = {4: {'time': 1, 'stopAngle': 100}}
+    expeditionState = {1: {'time': 0.5, 'stopAngle': 150},
+                       2: {'time': 0.75, 'stopAngle': 35},
+                       3: {'time': 0.5, 'stopAngle': 95},
+                       4: {'time': 0.25, 'stopAngle': 100}}
+    catchState = {1: {'time': 0.7, 'stopAngle': 4},
+                  2: {'time': 0.35, 'stopAngle': 185},
+                  3: {'time': 0.5, 'stopAngle': 95},
+                  4: {'time': 0.25, 'stopAngle': 50}}
+    putState = {1: {'time': 0.7, 'stopAngle': 50},
+                2: {'time': 0.35, 'stopAngle': 155},
+                3: {'time': 0.5, 'stopAngle': 95}}
+    catch = {4: {'time': 0.25, 'stopAngle': 100}}
+    throw = {4: {'time': 0.25, 'stopAngle': 50}}
+
+    def __init__(self):
+        self.executeTrajectory(self.calcTrajectory(self.expeditionState))
 
     # Рассчёт плавной траектории. Время траветории в секундах, начальный угол, конечный угол
     def calcSmothMove(self, time, startAngle, stopAngle):

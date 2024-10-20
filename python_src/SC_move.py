@@ -29,9 +29,9 @@ def setDirection(direction, speed):
         setMotor(1, abs(direction), speed)
         setMotor(2, 0, speed)
 
-'''
+
 speed = int(input())
 while True:
     direction = float(input())
     setDirection(direction, speed)
-'''
+

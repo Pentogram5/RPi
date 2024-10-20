@@ -15,7 +15,7 @@ class RobotDirection:
         self.speed_const_left = left
         self.speed_const_right = right
     def set_speed_cms_left(self, speed):
-        print(speed, ts.timestamp())
+        # print(speed, ts.timestamp())
         return speed
     def set_speed_cms_right(self, speed):
         return speed

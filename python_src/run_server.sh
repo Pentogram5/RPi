@@ -1,0 +1,1 @@
+python /home/pi/work/python_src/SC_server_tcp.py

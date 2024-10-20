@@ -1,8 +1,8 @@
 import threading
 import time
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import json
-# GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BCM)
 
 # class TimeStamper:
 #     def __init__(self):
@@ -36,12 +36,14 @@ class ScInfrared:
         if timestamp:
             self.timestamp = timestamp
         # self.ts = TimeStamper()
-        # GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.tr = ThreadRate(update_rate)
 
     def getNewRawValue(self):
-        # self.rawValue = GPIO.input(self.pin)
-        self.rawValue = (self.rawValue+1) % 100
+        # if self.id=="IR_GREEN":
+        #     print(GPIO.input(self.pin))
+        self.rawValue = GPIO.input(self.pin)
+        # self.rawValue = (self.rawValue+1) % 100
         return self.rawValue
     
     def getRawValue(self):
